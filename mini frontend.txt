@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriShare - Smart Crop Planning Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2d5a27;
+            margin-bottom: 10px;
+        }
+        
+        .tagline {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .section h2 {
+            color: #2d5a27;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .upload-form {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        label {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        input, select, textarea {
+            padding: 12px;
+            border: 2px solid #e1e1e1;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .map-container {
+            height: 300px;
+            background: linear-gradient(45deg, #a8d5ba, #7fc8a9);
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .map-pin {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 3px solid white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+        
+        .map-pin:hover {
+            transform: scale(1.5);
+        }
+        
+        .map-pin.corn {
+            background: #f1c40f;
+            top: 30%;
+            left: 25%;
+        }
+        
+        .map-pin.wheat {
+            background: #e67e22;
+            top: 45%;
+            left: 60%;
+        }
+        
+        .map-pin.rice {
+            background: #27ae60;
+            top: 60%;
+            left: 40%;
+        }
+        
+        .map-pin.soy {
+            background: #8e44ad;
+            top: 75%;
+            left: 70%;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+        }
+        
+        .map-legend {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .insight-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .insight-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .insight-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .insight-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .alerts-section {
+            grid-column: span 2;
+        }
+        
+        .alert-item {
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+            color: #333;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideIn 0.5s ease;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .alert-toggle {
+            background: rgba(255, 255, 255, 0.3);
+            border: none;
+            padding: 5px 10px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        
+        .bottom-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+        
+        .crop-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .crop-item {
+            background: linear-gradient(45deg, #a8d5ba, #7fc8a9);
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .crop-info {
+            flex: 1;
+        }
+        
+        .crop-name {
+            font-weight: bold;
+            color: #2d5a27;
+        }
+        
+        .crop-details {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .crop-status {
+            padding: 5px 10px;
+            border-radius: 15px;
+            background: white;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .bottom-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .alerts-section {
+                grid-column: span 1;
+            }
+        }
+        
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">🌾 AgriShare</div>
+            <div class="tagline">Smart Crop Planning & Community Insights Platform</div>
+        </header>
+        
+        <div class="main-content">
+            <section class="section">
+                <h2>📊 Upload Your Crop Data</h2>
+                <form class="upload-form" id="cropForm">
+                    <div class="form-group">
+                        <label for="cropType">Crop Type</label>
+                        <select id="cropType" required>
+                            <option value="">Select crop type...</option>
+                            <option value="corn">Corn</option>
+                            <option value="wheat">Wheat</option>
+                            <option value="rice">Rice</option>
+                            <option value="soybean">Soybean</option>
+                            <option value="cotton">Cotton</option>
+                            <option value="tomatoes">Tomatoes</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="location">Field Location</label>
+                        <input type="text" id="location" placeholder="e.g., County, State" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="acreage">Acreage</label>
+                        <input type="number" id="acreage" placeholder="Enter acres" min="1" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="plantingDate">Planting Date</label>
+                        <input type="date" id="plantingDate" required>
+                    </div>
+                    
+                    <button type="submit" class="btn">Add Crop Data</button>
+                </form>
+            </section>
+            
+            <section class="section">
+                <h2>🗺️ Regional Crop Map</h2>
+                <div class="map-container" id="mapContainer">
+                    <div class="map-pin corn" data-crop="Corn - 45 acres" data-farmer="Johnson Farm"></div>
+                    <div class="map-pin wheat" data-crop="Wheat - 32 acres" data-farmer="Miller Fields"></div>
+                    <div class="map-pin rice" data-crop="Rice - 28 acres" data-farmer="Green Valley Co."></div>
+                    <div class="map-pin soy" data-crop="Soybean - 67 acres" data-farmer="Prairie Farms"></div>
+                </div>
+                <div class="map-legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #f1c40f;"></div>
+                        <span>Corn</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #e67e22;"></div>
+                        <span>Wheat</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #27ae60;"></div>
+                        <span>Rice</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #8e44ad;"></div>
+                        <span>Soybean</span>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <div class="bottom-section">
+            <section class="section">
+                <h2>📈 Area Insights</h2>
+                <div class="insights-grid">
+                    <div class="insight-card">
+                        <div class="insight-number">172</div>
+                        <div class="insight-label">Total Acres</div>
+                    </div>
+                    <div class="insight-card">
+                        <div class="insight-number">4</div>
+                        <div class="insight-label">Crop Types</div>
+                    </div>
+                    <div class="insight-card">
+                        <div class="insight-number">12</div>
+                        <div class="insight-label">Active Farms</div>
+                    </div>
+                </div>
+                
+                <h3 style="color: #2d5a27; margin: 20px 0 10px 0;">Recent Plantings</h3>
+                <div class="crop-list" id="cropList">
+                    <div class="crop-item">
+                        <div class="crop-info">
+                            <div class="crop-name">Soybean Field #3</div>
+                            <div class="crop-details">Prairie Farms • 67 acres • Planted Mar 15</div>
+                        </div>
+                        <div class="crop-status">Active</div>
+                    </div>
+                    <div class="crop-item">
+                        <div class="crop-info">
+                            <div class="crop-name">Corn Plot A</div>
+                            <div class="crop-details">Johnson Farm • 45 acres • Planted Mar 12</div>
+                        </div>
+                        <div class="crop-status">Active</div>
+                    </div>
+                    <div class="crop-item">
+                        <div class="crop-info">
+                            <div class="crop-name">Wheat Field North</div>
+                            <div class="crop-details">Miller Fields • 32 acres • Planted Mar 8</div>
+                        </div>
+                        <div class="crop-status">Active</div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="section">
+                <h2>🔔 Smart Alerts</h2>
+                <div id="alertsList">
+                    <div class="alert-item">
+                        <div>
+                            <strong>High Corn Density</strong><br>
+                            <small>3 farms planting corn within 5 miles</small>
+                        </div>
+                        <button class="alert-toggle" onclick="toggleAlert(this)">Active</button>
+                    </div>
+                    <div class="alert-item">
+                        <div>
+                            <strong>Market Opportunity</strong><br>
+                            <small>Low soybean density in your area</small>
+                        </div>
+                        <button class="alert-toggle" onclick="toggleAlert(this)">Active</button>
+                    </div>
+                    <div class="alert-item">
+                        <div>
+                            <strong>Weather Alert</strong><br>
+                            <small>Optimal planting conditions this week</small>
+                        </div>
+                        <button class="alert-toggle" onclick="toggleAlert(this)">Active</button>
+                    </div>
+                </div>
+                
+                <button class="btn" style="width: 100%; margin-top: 20px;" onclick="showAlertSetup()">
+                    ⚙️ Set Up New Alert
+                </button>
+            </section>
+        </div>
+    </div>
+    
+    <div class="tooltip" id="tooltip"></div>
+    
+    <script>
+        // Form submission handler
+        document.getElementById('cropForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                cropType: document.getElementById('cropType').value,
+                location: document.getElementById('location').value,
+                acreage: document.getElementById('acreage').value,
+                plantingDate: document.getElementById('plantingDate').value
+            };
+            
+            // Add new crop to the list
+            addCropToList(formData);
+            
+            // Reset form
+            this.reset();
+            
+            // Show success message
+            alert('Crop data uploaded successfully! 🌱');
+        });
+        
+        function addCropToList(cropData) {
+            const cropList = document.getElementById('cropList');
+            const newCrop = document.createElement('div');
+            newCrop.className = 'crop-item';
+            newCrop.style.animation = 'slideIn 0.5s ease';
+            
+            const plantingDate = new Date(cropData.plantingDate).toLocaleDateString();
+            
+            newCrop.innerHTML = `
+                <div class="crop-info">
+                    <div class="crop-name">${cropData.cropType.charAt(0).toUpperCase() + cropData.cropType.slice(1)} Field</div>
+                    <div class="crop-details">Your Farm • ${cropData.acreage} acres • Planted ${plantingDate}</div>
+                </div>
+                <div class="crop-status">New</div>
+            `;
+            
+            cropList.insertBefore(newCrop, cropList.firstChild);
+        }
+        
+        // Map pin hover effects
+        const mapPins = document.querySelectorAll('.map-pin');
+        const tooltip = document.getElementById('tooltip');
+        
+        mapPins.forEach(pin => {
+            pin.addEventListener('mouseenter', function(e) {
+                const crop = this.getAttribute('data-crop');
+                const farmer = this.getAttribute('data-farmer');
+                tooltip.innerHTML = `<strong>${farmer}</strong><br>${crop}`;
+                tooltip.style.opacity = '1';
+            });
+            
+            pin.addEventListener('mousemove', function(e) {
+                tooltip.style.left = e.pageX + 10 + 'px';
+                tooltip.style.top = e.pageY - 10 + 'px';
+            });
+            
+            pin.addEventListener('mouseleave', function() {
+                tooltip.style.opacity = '0';
+            });
+        });
+        
+        // Alert toggle function
+        function toggleAlert(button) {
+            if (button.textContent === 'Active') {
+                button.textContent = 'Paused';
+                button.style.background = 'rgba(255, 255, 255, 0.6)';
+                button.style.color = '#666';
+            } else {
+                button.textContent = 'Active';
+                button.style.background = 'rgba(255, 255, 255, 0.3)';
+                button.style.color = '#333';
+            }
+        }
+        
+        // Show alert setup (placeholder)
+        function showAlertSetup() {
+            alert('Alert setup feature coming soon! You\'ll be able to set custom alerts for specific crops, locations, and market conditions.');
+        }
+        
+        // Simulate real-time updates
+        setInterval(() => {
+            // Update insights with slight variations
+            const totalAcres = document.querySelector('.insight-number');
+            const currentValue = parseInt(totalAcres.textContent);
+            if (Math.random() > 0.7) {
+                totalAcres.textContent = currentValue + Math.floor(Math.random() * 5);
+            }
+        }, 10000);
+        
+        // Add some interactivity to crop items
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.crop-item')) {
+                const item = e.target.closest('.crop-item');
+                item.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    item.style.transform = 'scale(1)';
+                }, 150);
+            }
+        });
+    </script>
+</body>
+</html>
