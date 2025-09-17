@@ -1,2 +1,2 @@
-# smart-crop-planting-platform
+#smart-crop-planting-platform
 Empowering Farmers through Data-Driven Decision Making
